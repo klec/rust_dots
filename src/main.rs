@@ -12,15 +12,15 @@ use rand::Rng;
 use rand::thread_rng as random;
 use std::cmp::Ordering;
 
-struct Vector {
-    x: i64,
-    y: i64
+struct Point {
+    position: (f64, f64),
+    speed: (f64, f64),
+    color: [f32; 4]
 }
 
 pub struct App {
     gl: GlGraphics,
-    position: Vector,
-    speed: (f64, f64)
+    points: [Point; 2], 
 }
 
 impl App {
@@ -32,8 +32,8 @@ impl App {
     
         let square = rectangle::square(0.0, 0.0, 5.0);
         
-        let x: f64 = self.position.x as f64;
-        let y: f64 = self.position.y as f64;
+        let x = self.points[0].position.0;
+        let y = self.points[0].position.1;
 
         self.gl.draw(args.viewport(), |c, gl| {
             clear(BLACK, gl);
@@ -43,19 +43,21 @@ impl App {
         });
     }
 
-    fn update(&mut self, args: &UpdateArgs) {
-        match 200.cmp(&self.position.x) {
-            Ordering::Less => self.speed.0 -= 0.2,
-            Ordering::Greater => self.speed.0 += 0.2,
-            Ordering::Equal => {},
+    fn update(&mut self, args: &UpdateArgs) { //@todo process array of points
+        let mut pointPosition = self.points[0].position;
+        if pointPosition.0 > 200.0 {
+            self.points[0].speed.0 -= 0.2;
+        } else {
+            self.points[0].speed.0 += 0.2;
         }
-        match 200.cmp(&self.position.y) {
-            Ordering::Less => self.speed.1 -= 0.2,
-            Ordering::Greater => self.speed.1 += 0.2,
-            Ordering::Equal => {},
+        
+        if pointPosition.1 > 200.0 {
+            self.points[0].speed.1 -= 0.2;
+        } else {
+            self.points[0].speed.1 += 0.2;
         }
-        self.position.x += self.speed.0 as i64;
-        self.position.y += self.speed.1 as i64;
+        self.points[0].position.0 += self.points[0].speed.0; 
+        self.points[0].position.1 += self.points[0].speed.1;
     }
 }
 
@@ -67,11 +69,21 @@ fn main() {
         .exit_on_esc(true)
         .build()
         .unwrap();
-
+    
+        let point1:Point = Point {
+            position: (random().gen_range(1..100) as f64, random().gen_range(1..100) as f64),
+            speed: (random().gen_range(-1..1) as f64, random().gen_range(-1..1) as f64),
+            color: [1.0, 0.0, 0.0, 1.0]
+        };
+        let point2:Point = Point {
+            position: (random().gen_range(1..100) as f64, random().gen_range(1..100) as f64),
+            speed: (random().gen_range(-1..1) as f64, random().gen_range(-1..1) as f64),
+            color: [1.0, 0.0, 0.0, 1.0]
+        };
+        
     let mut app = App {
         gl: GlGraphics::new(opengl),
-        position: Vector {x: random().gen_range(1..100), y: random().gen_range(1..100)},
-        speed: (random().gen_range(-1..1) as f64, random().gen_range(-1..1) as f64)
+        points: [point1, point2],
     };
 
     let mut events = Events::new(EventSettings::new());
