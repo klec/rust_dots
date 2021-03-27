@@ -41,24 +41,24 @@ impl App {
     }
 
     fn update(&mut self, args: &UpdateArgs) { //@todo process array of points
-        
-        let x = self.points[0].position.0 as u32;
-        let y = self.points[0].position.1 as u32;
-        
-        match 200.cmp(&x) {
-            Ordering::Less => self.points[0].speed.0 -= 0.2,
-            Ordering::Greater => self.points[0].speed.0 += 0.2,
-            Ordering::Equal => {},
-        }
+        for point in self.points.iter_mut() {
+            let x = point.position.0 as u32;
+            match 200.cmp(&x) {
+                Ordering::Less => point.speed.0 -= 0.2,
+                Ordering::Greater => point.speed.0 += 0.2,
+                Ordering::Equal => {},
+            }
+            
+            let y = point.position.1 as u32;
+            match 200.cmp(&y) {
+                Ordering::Less => point.speed.1 -= 0.2,
+                Ordering::Greater => point.speed.1 += 0.2,
+                Ordering::Equal => {},
+            }
 
-        match 200.cmp(&y) {
-            Ordering::Less => self.points[0].speed.1 -= 0.2,
-            Ordering::Greater => self.points[0].speed.1 += 0.2,
-            Ordering::Equal => {},
+            point.position.0 += point.speed.0; 
+            point.position.1 += point.speed.1;
         }
-
-        self.points[0].position.0 += self.points[0].speed.0; 
-        self.points[0].position.1 += self.points[0].speed.1;
     }
 }
 
