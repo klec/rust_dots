@@ -25,9 +25,21 @@ pub struct App {
 
 impl Point {
     fn new() -> Self {
-        Point { position: (random().gen_range(300..500) as f64, random().gen_range(300..500) as f64),
-            speed: (random().gen::<f64>()*20.0-10.0, random().gen::<f64>()*20.0-10.0),
-            color: [1.0, 0.0, 0.0, 1.0] }
+        Point { position: (Self::random(300.0, 200.0), Self::random(300.0, 200.0) as f64),
+            speed: (Self::random(-10.0, 20.0), Self::random(-10.0, 20.0)),
+            color: Self::randomColor() }
+    }
+
+    fn random(from:f64, size: f64) -> f64 {
+        return random().gen::<f64>()*size+from;
+    }
+
+    fn randomColor() -> [f32; 4] {
+        let r = random().gen::<f32>();
+        let g = random().gen::<f32>();
+        let b = random().gen::<f32>();
+        let o = random().gen::<f32>();
+        return [r,g,b,o];
     }
 }
 
@@ -46,12 +58,12 @@ impl App {
             for point in points.iter() {
                 let pos : (f64, f64) = point.position;
                 let transform = c.transform.trans(pos.0, pos.1);
-                circle_arc(RED, 1.0, 0.0, 1.0, square, transform, gl);
+                circle_arc(point.color, 1.0, 0.0, 1.0, square, transform, gl);
             }
         });
     }
 
-    fn update(&mut self, args: &UpdateArgs) { //@todo process array of points
+    fn update(&mut self, args: &UpdateArgs) {
         for point in self.points.iter_mut() {
             let x = point.position.0 as u32;
             match 400.cmp(&x) {
