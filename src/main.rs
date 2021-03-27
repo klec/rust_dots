@@ -32,30 +32,31 @@ impl App {
     
         let square = rectangle::square(0.0, 0.0, 5.0);
         
-        let x = self.points[0].position.0;
-        let y = self.points[0].position.1;
-
+        let pos : (f64, f64) = self.points[0].position;
         self.gl.draw(args.viewport(), |c, gl| {
             clear(BLACK, gl);
-            let transform = c.transform.trans(x, y);
-            // rectangle(RED, square, transform, gl);
+            let transform = c.transform.trans(pos.0, pos.1);
             circle_arc(RED, 3.0, 0.0, 10.0, square, transform, gl)
         });
     }
 
     fn update(&mut self, args: &UpdateArgs) { //@todo process array of points
-        let mut pointPosition = self.points[0].position;
-        if pointPosition.0 > 200.0 {
-            self.points[0].speed.0 -= 0.2;
-        } else {
-            self.points[0].speed.0 += 0.2;
-        }
         
-        if pointPosition.1 > 200.0 {
-            self.points[0].speed.1 -= 0.2;
-        } else {
-            self.points[0].speed.1 += 0.2;
+        let x = self.points[0].position.0 as u32;
+        let y = self.points[0].position.1 as u32;
+        
+        match 200.cmp(&x) {
+            Ordering::Less => self.points[0].speed.0 -= 0.2,
+            Ordering::Greater => self.points[0].speed.0 += 0.2,
+            Ordering::Equal => {},
         }
+
+        match 200.cmp(&y) {
+            Ordering::Less => self.points[0].speed.1 -= 0.2,
+            Ordering::Greater => self.points[0].speed.1 += 0.2,
+            Ordering::Equal => {},
+        }
+
         self.points[0].position.0 += self.points[0].speed.0; 
         self.points[0].position.1 += self.points[0].speed.1;
     }
@@ -64,7 +65,7 @@ impl App {
 fn main() {
     let opengl = OpenGL::V3_2;
 
-    let mut window: Window = WindowSettings::new("spinning-square", [400, 400])
+    let mut window: Window = WindowSettings::new("Floating points", [400, 400])
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
